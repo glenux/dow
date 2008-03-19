@@ -17,19 +17,36 @@ let send_string sock str =
         let _ = Unix.send sock str 0 len [] in
         ()
 
-let do_get client_sock location = 
+let do_get client_sock req location = 
+        ignore req ;
         send_string client_sock "HTTP/1.1 200/OK\nContent-type: text/html\n\n" ;
-        let location_html = Wiki.render location 
+
+        let (wiki_page, wiki_action) = 
+            let handle_action action =
+                match action with 
+                | "view" -> Wiki.Html
+                | "edit" -> Wiki.Raw
+                | _ -> Wiki.Html (* FIXME *)
+            in
+
+            try 
+                Scanf.sscanf location "/%[a-zA-Z]/%[a-z]" 
+                (fun page -> fun action -> ( page, handle_action action ) )
+            with
+            | End_of_file -> 
+                    Printf.printf "<-- HTTP.GET: EOF [%s]\n" location;
+                    flush stdout ;
+                    ( Wiki.homepage, Wiki.Html )
+            | Scanf.Scan_failure _ -> 
+                    Printf.printf "<-- WIKI.GET: Invalid page [%s]\n" location ;
+                    flush stdout ;
+                    ( Wiki.homepage, Wiki.Html )
+        in
+
+        let page_html = Wiki.get wiki_page wiki_action
         in
         send_string client_sock 
-                (Printf.sprintf "<html><body>%s</body></html>" location_html) ;
-        ()
-
-let do_post client_sock location =
-        send_string client_sock "HTTP/1.1 200/OK\nContent-type: text/html\n\n" ;
-        send_string client_sock 
-                (Printf.sprintf "<html><body><h1>Edit %s</h1></body></html>"
-                location) ;
+                (Printf.sprintf "<html><body>%s</body></html>" page_html) ;
         ()
 
 (* handle accept *)
@@ -43,8 +60,8 @@ let do_accept client_sock =
                         http_req http_location http_proto ; 
                 flush stdout ;
                 match http_req with
-                | "GET" -> do_get client_sock http_location
-                | "POST" -> do_post client_sock http_location
+                | "GET" -> do_get client_sock http_req http_location
+                | "POST" -> do_get client_sock http_req http_location
                 | _ -> Printf.printf "Bad http-req %s\n" http_req ; ()
         in
 
