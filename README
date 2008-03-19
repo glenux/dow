@@ -1,0 +1,18 @@
+Desktop-based Ocaml Wiki
+
+Syntax:
+* internal link
+* external link
+* headlines
+* bold
+* italic
+* underline
+* monospace/verbatim
+* strikethrough
+* bullet list
+* numbered list
+
+* backlinks (list + count)
+* orphaned pages (list + count)
+* wiki map
+
