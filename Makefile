@@ -1,10 +1,11 @@
 PROGRAMS=dow
 
 dow_OBJS= \
-	  wiki \
-	  http \
-	  document \
-	  main
+	  StringMap \
+	  Wiki \
+	  Http \
+	  Document \
+	  Main
 
 OPTS=-w A -warn-error A -g -thread 
 dow_LIBS=unix threads

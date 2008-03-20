@@ -1,12 +1,12 @@
 (* vim: set ts=2 sw=2 et : *)
 
-module StringMap = Map.Make(String)
-
 type action_t = 
   | Html
   | Raw
   | Change of string (* all text *)
   | Insert of int (* offset *) * string (* inserted text *)
+;;
+
 
 let string_of_action action = 
   match action with
@@ -14,21 +14,45 @@ let string_of_action action =
   | Raw -> "Raw"
   | Change text -> Printf.sprintf "Change(%s)" text
   | Insert(offset,text) -> Printf.sprintf "Insert(%d,%s)" offset text
+;;
+
 
 let wiki = ref StringMap.empty
+;;
+
 
 let homepage = "HomePage"
+;;
+
 
 let handle_change page text =
   ignore text ;
   ignore page ;
   ""
+;;
+
 
 let handle_insert page offset text =
   ignore page ;
   ignore offset ;
   ignore text ;
   ""
+;;
+
+
+exception Unknown_page of string
+;;
+
+
+let htmlize text = 
+   text
+;;
+
+
+let is_empty page =
+  not ( StringMap.mem page !wiki )
+;;
+
 
 let handle_html page = 
   Printf.printf "<-- WIKI.VIEW: [%s]\n" page ;
@@ -39,15 +63,15 @@ let handle_html page =
    * - edit button
    *)
   if ( StringMap.mem page !wiki ) then
-    let page_data = StringMap.find page !wiki
-    in
-    "<h1>View " ^ page ^ "</h1>" ^
-    page_data ^
-    "<a href=\"/" ^ page ^ "/edit\">Edit</a>"
+    htmlize ( StringMap.find page !wiki )
   else
-    "<h1>Unknown page " ^ page ^ "</h1>" ^
+    raise ( Unknown_page page )
+    (* "<h1>Unknown page " ^ page ^ "</h1>" ^
     "<p>Would you like to create it ?</p>" ^
-    "<a href=\"/" ^ page ^ "/edit\">Edit</a>"
+    "<a href=\"/" ^ page ^ "/edit\">Edit</a>" *)
+
+;;
+
 
 
 
@@ -60,21 +84,11 @@ let handle_raw page =
    * - cancel button
    *)
 
-  let page_data = 
   if ( StringMap.mem page !wiki ) then
     StringMap.find page !wiki 
   else 
-    ""
-    in
-    "<h1>Edit " ^ page ^ "</h1>" ^
-    "<form action=\"" ^ page ^ "/edit\" method=\"post\" >" ^
-    "<textarea name=\"content\">" ^
-    page_data ^
-    "</textarea>" ^
-    "<input type=\"submit\" value=\"save\" >" ^
-    "<input type=\"submit\" value=\"preview\" >" ^
-    "<input type=\"button\" value=\"cancel\" >" ^
-    "</form>"
+    "Write here the content of page " ^ page
+;;
 
 
 let handle page action  =
