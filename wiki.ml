@@ -66,11 +66,11 @@ let handle_raw page =
   else 
     ""
     in
-    "<h1>View " ^ page ^ "</h1>" ^
-    "<textarea>" ^
+    "<h1>Edit " ^ page ^ "</h1>" ^
+    "<form action=\"" ^ page ^ "/edit\" method=\"post\" >" ^
+    "<textarea name=\"content\">" ^
     page_data ^
     "</textarea>" ^
-    "<form action=\"" ^ page ^ "/edit\" method=\"post\" >" ^
     "<input type=\"submit\" value=\"save\" >" ^
     "<input type=\"submit\" value=\"preview\" >" ^
     "<input type=\"button\" value=\"cancel\" >" ^

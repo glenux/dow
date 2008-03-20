@@ -20,5 +20,6 @@ let create () =
         []
 
 let delete docname = 
+        ignore docname ; (* FIXME *)
         ()
 

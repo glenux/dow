@@ -9,9 +9,9 @@ OCAMLDEP=ocamldep
 OCAMLOPT=ocamlopt
 OCAMLC=ocamlc
 
-OPTS=-w A -g -thread 
-INCS=
-LIBS=
+OPTS+=
+INCS+=
+LIBS+=
 
 define PROGRAM_template
 ALL_OBJS   += $($(1)_OBJS)
