@@ -2,6 +2,7 @@ PROGRAMS=dow
 
 dow_OBJS= \
 	  wiki \
+	  http \
 	  document \
 	  main
 

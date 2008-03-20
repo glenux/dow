@@ -1,21 +1,36 @@
 (* vim: set ts=2 sw=2 et : *)
 
+module StringMap = Map.Make(String)
+
 type action_t = 
   | Html
   | Raw
   | Change of string (* all text *)
   | Insert of int (* offset *) * string (* inserted text *)
 
-
-module StringMap = Map.Make(String)
-
+let string_of_action action = 
+  match action with
+  | Html -> "Html"
+  | Raw -> "Raw"
+  | Change text -> Printf.sprintf "Change(%s)" text
+  | Insert(offset,text) -> Printf.sprintf "Insert(%d,%s)" offset text
 
 let wiki = ref StringMap.empty
 
 let homepage = "HomePage"
 
+let handle_change page text =
+  ignore text ;
+  ignore page ;
+  ""
 
-let get_view page = 
+let handle_insert page offset text =
+  ignore page ;
+  ignore offset ;
+  ignore text ;
+  ""
+
+let handle_html page = 
   Printf.printf "<-- WIKI.VIEW: [%s]\n" page ;
   (* return a html string for page 
    * - header
@@ -36,7 +51,7 @@ let get_view page =
 
 
 
-let get_edit page = 
+let handle_raw page = 
   (* return a html string for page 
    * - header
    * - title
@@ -62,29 +77,19 @@ let get_edit page =
     "</form>"
 
 
-let get location =
+let handle page action  =
   let handle_page_action page action = (
-    Printf.printf "<-- WIKI.GET: page=[%s] action=[%s]\n" page action ; 
-    flush stdout ;
     match action with 
-    | "edit" -> get_edit page
-    | "view" -> get_view page
-    | _ -> get_view page
+    | Change text -> handle_change page text
+    | Html -> handle_html page
+    | Raw -> handle_raw page 
+    | Insert (offset, text) -> handle_insert page offset text
   )
   in
-  Printf.printf "<-- WIKI.GET/RAW: [%s]\n" location ;
+  Printf.printf "<-- WIKI.GET: page=[%s] action=[%s]\n" 
+    page (string_of_action action) ; 
   flush stdout ;
-  try 
-    Scanf.sscanf location "/%[a-zA-Z]/%[a-z]" handle_page_action
-  with
-  | End_of_file -> 
-      Printf.printf "<-- WIKI.GET: EOF [%s]\n" location;
-      flush stdout ;
-      get_view "HomePage"
-  | Scanf.Scan_failure _ -> 
-      Printf.printf "<-- WIKI.GET: Invalid page [%s]\n" location ;
-      flush stdout ;
-      get_view "HomePage"
+  handle_page_action page action
 
 
 let post location =
