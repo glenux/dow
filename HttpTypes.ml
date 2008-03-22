@@ -117,6 +117,7 @@ type answer_t = {
   status: status_t ;
   aheaders : string StringMap.t ;
   aprotocol : protocol_t ;
+  send_content : bool ;
   content : string ;
 }
 ;;

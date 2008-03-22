@@ -6,7 +6,12 @@ let default_answer = {
   status = Client_error Method_not_allowed;
   aheaders = StringMap.empty ;
   aprotocol = Protocol_1_0 ;
-  content = "" ;
+  content = 
+    "<html>" ^ 
+    "<head><title>Method Not Allowed<title></head>" ^
+    "<body><h1>Method Not Allowed</h1></body>" ^
+    "</html>" ;
+  send_content = false;
 }
 ;;
 
@@ -15,9 +20,8 @@ let string_of_answer answer =
   let protocol_str = string_of_protocol answer.aprotocol
   and status_code = code_of_status answer.status
   and status_str = string_of_status answer.status
-  and data_str = "Whatever !!!\n"
   in
-  let data_len = String.length data_str
+  let content_len = String.length answer.content
   in
   (* status code *)
   (* content-type *)
@@ -25,8 +29,8 @@ let string_of_answer answer =
   (* etc.. *)
   ( Printf.sprintf "HTTP/%s %d %s\n" protocol_str status_code status_str ) ^ 
   ( Printf.sprintf "Content-Type: text/html\n" ) ^
-  ( Printf.sprintf "Content-Length: %d\n" data_len ) ^
+  ( Printf.sprintf "Content-Length: %d\n" content_len ) ^
   ( "\n" ) ^
-  ( "Whatever !!!\n" )
+  ( if answer.send_content then answer.content else "" )
 
 ;;
