@@ -2,12 +2,12 @@ PROGRAMS=dow
 
 dow_OBJS= \
 	  StringMap \
-	  WikiEngine \
-	  WikiHtml \
 	  HttpTypes \
 	  HttpRequest \
 	  HttpAnswer \
 	  Http \
+	  WikiEngine \
+	  WikiHtml \
 	  Document \
 	  Main
 
