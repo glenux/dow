@@ -1,15 +1,27 @@
 (* vim: set ts=2 sw=2 et : *)
 
+(** This module provides the basic types and operations for the HTTP components. *)
+
+
+(** {2 Exceptions} *)
+
+
+(** the {! Unknown_method} exception is raised when receiving an invalid HTTP request
+ *)
 exception Unknown_method of string;;
+
 
 exception Unknown_protocol of string;;
 
+
 exception Invalid_request of string;;
+
 
 type status_information_t =
   | Continue
   | Switching_protocols
 ;;
+
 
 type status_success_t = 
   | Ok
@@ -21,15 +33,17 @@ type status_success_t =
   | Partial_content
 ;;
 
+
 type status_redirection_t =
-  | Multiple_Choices
-  | Moved_Permanently
+  | Multiple_choices
+  | Moved_permanently
   | Found
-  | See_Other
-  | Not_Modified
-  | Use_Proxy
-  | Temporary_Redirect
+  | See_other
+  | Not_modified
+  | Use_proxy
+  | Temporary_redirect
 ;;
+
 
 type status_clienterror_t =
   | Bad_request
@@ -52,6 +66,7 @@ type status_clienterror_t =
   | Expectation_failed
 ;;
 
+
 type status_servererror_t =
   | Internal_server_error
   | Not_implemented
@@ -60,6 +75,7 @@ type status_servererror_t =
   | Gateway_timeout
   | HTTP_version_not_supported
 ;;
+
 
 (* http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html *)
 type status_t =
@@ -105,13 +121,63 @@ type answer_t = {
 }
 ;;
 
+
+(**
+ @param status an HTTP status
+ *)
 let string_of_status status = 
   match status with
-  | Informational _ ->  "info"
-  | Success _ ->  "success"
-  | Redirection _ -> "redir"
-  | Client_error _ -> "client-error"
-  | Server_error _ -> "server-error"
+  | Informational sub -> (
+    match sub with
+    | Continue -> "Continue"
+    | Switching_protocols -> "Switching Protocols" )
+  | Success sub -> ( 
+    match sub with
+    | Ok -> "Ok"
+    | Created -> "Created"
+    | Accepted -> "Accepted"
+    | NonAuthoritative_information -> "Non-Authoritative Information"
+    | No_content -> "No Content"
+    | Reset_content -> "Reset Content"
+    | Partial_content -> "Partial Content" )
+  | Redirection sub -> ( 
+    match sub with
+    | Multiple_choices -> "Multiple Choices"
+    | Moved_permanently -> "Moved Permanently"
+    | Found -> "Found"
+    | See_other -> "See Other"
+    | Not_modified -> "Not Modified"
+    | Use_proxy -> "Use Proxy"
+    | Temporary_redirect -> "Temporary Redirect" )
+  | Client_error sub -> (
+    match sub with
+    | Bad_request -> "Bad Request"
+    | Unauthorized -> "Unauthorized"
+    | Payment_required -> "Payment Required"
+    | Forbidden -> "Forbidden"
+    | URI_Not_found -> "Not Found"
+    | Method_not_allowed -> "Method Not Allowed"
+    | Not_acceptable -> "Not Acceptable"
+    | Proxy_authentication_required -> "Proxy Authentication Required"
+    | Request_timeout -> "Request Timeout"
+    | Conflict -> "Conflict"
+    | Gone -> "Gone"
+    | Length_required -> "Length Required"
+    | Precondition_failed -> "Precondition Failed"
+    | Request_entity_too_large -> "Request Entity Too Large"
+    | Request_URI_too_long -> "Request URI Too Long"
+    | Unsupported_media_type -> "Unsupported Media Type"
+    | Requested_range_not_satisfiable -> "Requested Range Not Satisfiable"
+    | Expectation_failed -> "Expectation Failed" )
+  | Server_error sub -> ( 
+    match sub with
+    | Internal_server_error -> "Internal Server Error"
+    | Not_implemented -> "Not Implemented"
+    | Bad_gateway -> "Bad Gateway"
+    | Service_unavailable -> "Service Unavailable"
+    | Gateway_timeout -> "Gateway Timeout"
+    | HTTP_version_not_supported -> "HTTP Version Not Supported" )
+
 ;;
 
 let code_of_status status = 
@@ -131,13 +197,13 @@ let code_of_status status =
     | Partial_content -> 6 )
   | Redirection sub -> 300 + ( 
     match sub with
-    | Multiple_Choices -> 0
-    | Moved_Permanently -> 1
+    | Multiple_choices -> 0
+    | Moved_permanently -> 1
     | Found -> 2
-    | See_Other -> 3
-    | Not_Modified -> 4
-    | Use_Proxy -> 5
-    | Temporary_Redirect -> 6 )
+    | See_other -> 3
+    | Not_modified -> 4
+    | Use_proxy -> 5
+    | Temporary_redirect -> 6 )
   | Client_error sub -> 400 + (
     match sub with
     | Bad_request -> 0
