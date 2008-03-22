@@ -24,6 +24,19 @@ let wiki = ref StringMap.empty
 let homepage = "HomePage"
 ;;
 
+let get_handler request =
+  ignore request ;
+  { HttpAnswer.default_answer with
+    HttpTypes.status = HttpTypes.Success HttpTypes.Ok
+  }
+;;
+
+let post_handler request =
+  ignore request ;
+  { HttpAnswer.default_answer with
+    HttpTypes.status = HttpTypes.Success HttpTypes.Ok
+  }
+;;
 
 let handle_change page text =
   ignore text ;
