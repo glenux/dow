@@ -27,15 +27,16 @@ let homepage = "HomePage"
 let get_handler request =
   ignore request ;
   { HttpAnswer.default_answer with
-    HttpTypes.status = HttpTypes.Success HttpTypes.Ok
+    HttpTypes.status = HttpTypes.Success HttpTypes.Ok ;
+    HttpTypes.aprotocol = request.HttpTypes.rprotocol ; 
+    HttpTypes.send_content = true ;
+    HttpTypes.content = "Wiki got request!" 
   }
 ;;
 
 let post_handler request =
   ignore request ;
-  { HttpAnswer.default_answer with
-    HttpTypes.status = HttpTypes.Success HttpTypes.Ok
-  }
+  HttpAnswer.default_answer
 ;;
 
 let handle_change page text =
