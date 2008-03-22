@@ -7,7 +7,7 @@ dow_OBJS= \
 	  HttpAnswer \
 	  Http \
 	  WikiEngine \
-	  WikiHtml \
+	  WikiHttp \
 	  Document \
 	  Main
 

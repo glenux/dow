@@ -24,20 +24,7 @@ let wiki = ref StringMap.empty
 let homepage = "HomePage"
 ;;
 
-let get_handler request =
-  ignore request ;
-  { HttpAnswer.default_answer with
-    HttpTypes.status = HttpTypes.Success HttpTypes.Ok ;
-    HttpTypes.aprotocol = request.HttpTypes.rprotocol ; 
-    HttpTypes.send_content = true ;
-    HttpTypes.content = "Wiki got request!" 
-  }
-;;
 
-let post_handler request =
-  ignore request ;
-  HttpAnswer.default_answer
-;;
 
 let handle_change page text =
   ignore text ;
@@ -87,8 +74,6 @@ let handle_html page =
 ;;
 
 
-
-
 let handle_raw page = 
   (* return a html string for page 
    * - header
@@ -118,8 +103,11 @@ let handle page action  =
     page (string_of_action action) ; 
   flush stdout ;
   handle_page_action page action
+;;
 
 
 let post location =
   Printf.printf "<-- WIKI.POST/RAW: [%s]\n" location ;
-  flush stdout ;
+  flush stdout
+;;
+
