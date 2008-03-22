@@ -28,6 +28,7 @@ $(foreach prog,$(PROGRAMS),$(eval $(call PROGRAM_template,$(prog))))
 .PHONY: all
 all: $(PROGRAMS)
 
+.PHONY: doc
 doc: 
 	ocamldoc $(INCS) -d doc -html $(ML) $(MLI)
 
