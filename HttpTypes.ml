@@ -104,7 +104,7 @@ type method_t =
 
 type request_t = {
  rmethod : method_t ; (* don't forget the 'x' prefix... *)
- location : string ;
+ location : string list ;
  rprotocol : protocol_t ;
  rheaders: string StringMap.t ;
  post: string StringMap.t ;

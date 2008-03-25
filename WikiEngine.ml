@@ -1,28 +1,57 @@
 (* vim: set ts=2 sw=2 et : *)
 
+
+
 type action_t = 
-  | Html
-  | Raw
-  | Change of string (* all text *)
-  | Insert of int (* offset *) * string (* inserted text *)
+  | Get_html
+  | Get_text
+  | Get_tree
+  (* text actions *)
+  | Set_text of string (* all text *)
+  | Insert_text of int (* offset *) * string (* inserted text *)
+  | Remove_text of int (* offset *) * string (* removed text *)
+  (* tree actions *)
 ;;
 
+type 'a request_t = {
+  link : 'a ;
+  page : string ;
+  action : action_t ;
+}
+;;
+
+
+type answer_t = {
+  content: string ;
+}
+
+
+let default_page = "HomePage"
+;;
+
+let default_action = Get_html
+;;
 
 let string_of_action action = 
   match action with
-  | Html -> "Html"
-  | Raw -> "Raw"
-  | Change text -> Printf.sprintf "Change(%s)" text
-  | Insert(offset,text) -> Printf.sprintf "Insert(%d,%s)" offset text
+  | Get_html -> "Get Html"
+  | Get_text -> "Get Text"
+  | Get_tree -> "Get Tree (?)"
+  | Set_text text -> Printf.sprintf "Set Text [%s]" text
+  | Insert_text ( offset, text ) -> Printf.sprintf "Insert(%d,%s)" offset text
+  | Remove_text ( offset, text ) -> Printf.sprintf "Remove(%d,%s)" offset text
 ;;
 
+let string_of_request request = 
+  Printf.sprintf "action=[%s] page[%s]" 
+  (string_of_action request.action)
+  (request.page)
+;;
 
 let wiki = ref StringMap.empty
 ;;
 
 
-let homepage = "HomePage"
-;;
 
 
 
@@ -82,27 +111,26 @@ let handle_raw page =
    * - save button
    * - cancel button
    *)
-
   if ( StringMap.mem page !wiki ) then
     StringMap.find page !wiki 
   else 
     "Write here the content of page " ^ page
 ;;
 
-
-let handle page action  =
-  let handle_page_action page action = (
+let handle_request request = 
+  (* let handle_page_action =page action = (
     match action with 
     | Change text -> handle_change page text
     | Html -> handle_html page
     | Raw -> handle_raw page 
     | Insert (offset, text) -> handle_insert page offset text
   )
-  in
-  Printf.printf "<-- WIKI.GET: page=[%s] action=[%s]\n" 
-    page (string_of_action action) ; 
+  in *)
+  Printf.printf "<-- WIKI.HANDLE_REQUEST: [%s]\n" 
+    (string_of_request request) ; 
   flush stdout ;
-  handle_page_action page action
+  ""
+  (* handle_page_action page action *)
 ;;
 
 

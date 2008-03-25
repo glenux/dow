@@ -1,131 +1,194 @@
 (* vim: set ts=2 sw=2 et : *)
 
-type handler_t =
-  | EditPost
-  | EditGet
+open WikiEngine;;
+
+type urlhandler_t =
+  | Edit
   | View
 ;;
 
 
-let read_string sock = 
-  let strlen = 1024 in
-  let strbuf = String.make strlen '\000' in
-  let _ = Unix.recv sock strbuf 0 strlen [] in
-  strbuf
+let string_from_urlhandler = function
+  | Edit -> "edit"
+  | View -> "view"
 ;;
 
 
+let urlhandler_from_action = function
+  | Get_html -> View
+  | Get_text -> Edit
+  | Set_text _ -> Edit
+  | Insert_text (_,_) -> Edit (* FIXME *)
+  | Remove_text (_,_) -> Edit (* FIXME *)
+  | Get_tree -> View (* FIXME *)
+;;
+
+
+let urlhandler_from_string = function
+  | "view" -> View
+  | "edit" -> Edit
+  | _ -> urlhandler_from_action default_action
+;;
+
+
+
+let get_action_from_urlhandler = function
+  | View -> Get_html
+  | Edit -> Get_text
+;;
+
+let post_action_from_urlhandler text = function
+  | View -> Get_html
+  | Edit -> Set_text text
+;;
+
+
+
+let page_from_request request =
+  let filter_page page = 
+    match page with
+    | "" -> default_page
+    | _ -> page
+  in
+  match request.HttpTypes.location with
+  | [] -> default_page
+  | pg::_ -> filter_page pg
+;;
+
+
+let action_from_request request =
+  match request.HttpTypes.location with
+  | [] -> default_action
+  | _::pg_tail -> 
+      match pg_tail with
+      | [] -> default_action
+      | uh::_ ->
+          match request.HttpTypes.rmethod with
+          | HttpTypes.Head -> 
+              get_action_from_urlhandler (urlhandler_from_string uh)
+          | HttpTypes.Get -> 
+              get_action_from_urlhandler (urlhandler_from_string uh)
+          | HttpTypes.Post -> 
+              get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
+          | HttpTypes.Put ->
+              get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
+          | HttpTypes.Delete ->
+              get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
+;;
+
+
+let wikirequest_from_request request = { 
+  link = request ;
+  page = page_from_request request ;
+  action = action_from_request request ;
+}
+;;
+
+
+let wikicontent_title_from_wikirequest wikirequest =
+  let unsupported_action =
+    Printf.sprintf "Unsupported action for \"%s\" on page \"%s\"" 
+    ( string_of_action wikirequest.action )
+    wikirequest.page
+  in
+  match wikirequest.action with
+  | Get_html -> 
+      if not ( is_empty wikirequest.page ) then wikirequest.page
+      else "Unknown page " ^ wikirequest.page
+  | Get_text -> Printf.sprintf "%s (editing)" wikirequest.page
+  | Get_tree -> unsupported_action
+  | Set_text _ -> unsupported_action
+  | Insert_text (_, _) -> unsupported_action
+  | Remove_text (_, _) -> unsupported_action
+;;
+
+
+let wikicontent_header_from_wikirequest wikirequest = 
+  "    <title>"^ (wikicontent_title_from_wikirequest wikirequest ) ^ "</title>\n"
+;;
+
+
+let wikicontent_body_from_wikirequest wikirequest =
+  let body_view_fmt = (
+    "%s\n" ^^ "<a href=\"/%s/edit\">Edit</a>\n" )
+  and body_edit_fmt = ( 
+    "<form action=\"/%s/edit\" method=\"post\" >\n" ^^
+    "<textarea name=\"content\">%s</textarea><br />\n" ^^
+    "<input type=\"submit\" value=\"save\" >\n" ^^
+    "<input type=\"submit\" value=\"preview\" >\n" ^^
+    "<input type=\"button\" value=\"cancel\" >\n" ^^
+    "</form>\n" )
+  and body_unknown_fmt = ( "Page %s does not exist.\n" ^^ "" )
+  in
+
+  let wiki_html () = 
+    if not ( is_empty wikirequest.page ) then handle_request wikirequest
+    else Printf.sprintf body_unknown_fmt wikirequest.page
+  and wiki_raw () =
+    if not ( is_empty wikirequest.page ) then handle_request wikirequest
+    else "Write here the content of page " ^ wikirequest.page
+  in
+
+  match wikirequest.action with
+  | Get_html -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
+  | Get_text -> Printf.sprintf body_edit_fmt wikirequest.page ( wiki_raw () )
+  | Get_tree -> Printf.sprintf body_edit_fmt wikirequest.page ( wiki_raw () )
+  | Set_text _ -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
+  | Insert_text (_, _) -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
+  | Remove_text (_, _) ->Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
+;;
+
+
+let wikicontent_from_wikirequest wikirequest = 
+  "<html>\n" ^ 
+  "  <head>\n" ^
+  wikicontent_header_from_wikirequest wikirequest ^
+  "  </head>\n" ^
+  "  <body>\n" ^
+  wikicontent_body_from_wikirequest wikirequest ^
+  "  </body>\n" ^
+  "</html>\n"
+;;
+
+
+
 let get_handler request =
-  ignore request ;
+  let wikirequest = wikirequest_from_request request
+  in
+  let wikicontent = wikicontent_from_wikirequest wikirequest
+  in
+ (* let wikianswer = handle_request wikirequest
+  in *)
+  (* convert request to wikirequest *)
+  (* 
+  let ( filtered_page, filtered_action ) =
+    pageaction_from_request request
+  in *)
   { HttpAnswer.default_answer with
     HttpTypes.status = HttpTypes.Success HttpTypes.Ok ;
     HttpTypes.aprotocol = request.HttpTypes.rprotocol ; 
     HttpTypes.send_content = true ;
-    HttpTypes.content = "Wiki got request!" 
+    HttpTypes.content = wikicontent ; (* "Wiki got a GET request for " ^
+    wikirequest.page ^ ":" ^ 
+    ( string_of_action wikirequest.action ) *)
   }
 ;;
 
 
+let head_handler request = 
+  let get_answer = get_handler request
+  in
+  { get_answer with
+    HttpTypes.send_content = false
+  }
+;;
+
+
+
 let post_handler request =
-  ignore request ;
-  HttpAnswer.default_answer
+  let post_answer = get_handler request
+  in 
+  post_answer
 ;;
 
-
-(*
-let html_from_request request =
-  let page_from_request request =
-    try 
-      Scanf.sscanf request.HttpTypes.location "/%[a-zA-Z]" 
-      (function
-       | "" -> WikiEngine.homepage
-       | page_str -> page_str )
-    with
-    | End_of_file ->  
-        Printf.printf "<-- HTTP.WIKIDATA2: EOF [%s]\n" request.HttpTypes.location;
-        flush stdout ;
-        WikiEngine.homepage
-    | Scanf.Scan_failure _ -> 
-        Printf.printf "<-- WIKI.WIKIDATA2: Invalid page [%s]\n" request.location ;
-        flush stdout ;
-        WikiEngine.homepage
-  in
-
-  let page_handler_from_request request = 
-    try 
-      Scanf.sscanf request.location "/%[a-zA-Z]/%[a-z]" 
-      (fun page_str -> 
-        fun handler_str -> 
-          ( page_str, handler_str ))
-    with
-    | End_of_file -> 
-        ( page_from_request request, "view" )
-    | Scanf.Scan_failure _ -> 
-        Printf.printf "<-- WIKI.WIKIDATA1: Invalid page [%s]\n" request.location ;
-        flush stdout ;
-        ( WikiEngine.homepage, "view" )
-  in
-
-  let ( wiki_page, wiki_handler_str ) = 
-    page_handler_from_request request
-  in
-
-  let wiki_action = 
-    match wiki_handler_str with
-    | "view" -> WikiEngine.Html
-    | "edit" -> 
-        if request.xmethod = Get then WikiEngine.Raw
-        else WikiEngine.Change "blabla"
-    | _ -> WikiEngine.Html
-
-  in
-
-  let wiki_has_page = not ( WikiEngine.is_empty wiki_page )
-  in
-
-  let title_html =
-    let title_str =
-      match wiki_action with
-      | WikiEngine.Html -> 
-          if wiki_has_page then wiki_page
-          else "Unknown page " ^ wiki_page
-      | WikiEngine.Raw -> Printf.sprintf "%s (editing)" wiki_page
-      | WikiEngine.Change _ -> wiki_page
-      | WikiEngine.Insert (_, _) -> wiki_page
-    in 
-    Printf.sprintf "<h1>%s</h1>" title_str
-  in
-
-  let body_html =
-    let body_view_fmt = (
-      "%s\n" ^^ "<a href=\"/%s/edit\">Edit</a>\n" )
-    and body_edit_fmt = ( 
-      "<form action=\"/%s/edit\" method=\"post\" >\n" ^^
-      "<textarea name=\"content\">%s</textarea>\n" ^^
-      "<input type=\"submit\" value=\"save\" >\n" ^^
-      "<input type=\"submit\" value=\"preview\" >\n" ^^
-      "<input type=\"button\" value=\"cancel\" >\n" ^^
-      "</form>\n" )
-    and body_unknown_fmt = ( "Page %s does not exist.\n" ^^ "" )
-    in
-
-    let wiki_html () = 
-      if wiki_has_page then WikiEngine.handle wiki_page wiki_action
-      else Printf.sprintf body_unknown_fmt wiki_page
-    and wiki_raw () =
-      if wiki_has_page then WikiEngine.handle wiki_page wiki_action
-      else "Write here the content of page " ^ wiki_page
-    in
-
-    match wiki_action with
-    | WikiEngine.Html -> Printf.sprintf body_view_fmt ( wiki_html () ) wiki_page
-    | WikiEngine.Raw -> Printf.sprintf body_edit_fmt wiki_page ( wiki_raw () )
-    | WikiEngine.Change _ -> Printf.sprintf body_view_fmt ( wiki_html () ) wiki_page
-    | WikiEngine.Insert (_, _) -> Printf.sprintf body_view_fmt ( wiki_html () ) wiki_page
-  in
-
-  (* send_string client_sock  *)
-  Printf.sprintf "<html><body>%s%s</body></html>" title_html body_html
-;;
-*)
 

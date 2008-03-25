@@ -72,7 +72,7 @@ let do_accept ~client_sock ~config =
   in
 
   (* fill request structure *)
-  let request = request_of_string request_str
+  let request = HttpRequest.request_of_string request_str
   in
 
   (* call handler for given request *)
@@ -83,7 +83,10 @@ let do_accept ~client_sock ~config =
   in
 
   (* send answer back to client *)
-  Printf.printf "--> HTTP.RAW [%s]\n" answer_str ; flush stdout ;
+  Printf.printf "<-- HTTP.REQUEST [%s]\n" ( string_of_request request ) ;
+  flush stdout ;
+  Printf.printf "--> HTTP.RAW [%s]\n" answer_str ; 
+  flush stdout ;
   send_string client_sock answer_str ;
   Unix.close client_sock
 ;;
