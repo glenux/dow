@@ -1,11 +1,13 @@
 PROGRAMS=dow
 
 dow_OBJS= \
-	  StringMap \
 	  HttpTypes \
 	  HttpRequest \
 	  HttpAnswer \
 	  Http \
+	  WikiHandler \
+	  WikiHandlerEdit \
+	  WikiHandlerView \
 	  WikiEngine \
 	  WikiHttp \
 	  Document \

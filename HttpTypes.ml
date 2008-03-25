@@ -104,18 +104,18 @@ type method_t =
 
 type request_t = {
  rmethod : method_t ; (* don't forget the 'x' prefix... *)
- location : string list ;
+ location : string;
  rprotocol : protocol_t ;
- rheaders: string StringMap.t ;
- post: string StringMap.t ;
- get: string StringMap.t ;
+ rheaders: ( string, string) Hashtbl.t ;
+ post: ( string, string) Hashtbl.t ;
+ get: ( string, string ) Hashtbl.t ;
 }
 ;;
 
 
 type answer_t = {
   status: status_t ;
-  aheaders : string StringMap.t ;
+  aheaders : ( string, string ) Hashtbl.t ;
   aprotocol : protocol_t ;
   send_content : bool ;
   content : string ;

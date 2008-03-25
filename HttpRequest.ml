@@ -2,14 +2,13 @@
 
 open HttpTypes;;
 
-
 let default_request = {
   rmethod = Get ;
-  location = [] ;
+  location = "/" ;
   rprotocol = Protocol_1_0 ;
-  rheaders = StringMap.empty ;
-  get = StringMap.empty ;
-  post = StringMap.empty ;
+  rheaders = Hashtbl.create 5;
+  get = Hashtbl.create 5 ;
+  post = Hashtbl.create 5 ;
 };;
 
 
@@ -22,7 +21,7 @@ let string_of_method xmethod =
   | Delete -> "DELETE" 
 ;;
 
-
+(*
 let rec string_of_location location =
   match location with 
   | hd_str::tail_str -> "/" ^ hd_str ^ ( string_of_location tail_str )
@@ -47,6 +46,7 @@ let rec location_of_string location_str =
         and suffix_str = String.sub location_str (idx + 1) ( len - idx - 1)
         in prefix_str :: ( location_of_string suffix_str )
 ;;
+*)
 
 let method_of_string method_str = 
   match method_str with
@@ -62,7 +62,8 @@ let method_of_string method_str =
 let string_of_request request =
   Printf.sprintf "method=[%s] location=[%s] protocol=[%s]" 
   ( string_of_method request.rmethod )
-  ( string_of_location request.location )
+  request.location
+  (* string_of_location request.location *)
   ( string_of_protocol request.rprotocol )
 ;;
 
@@ -71,7 +72,7 @@ let request_of_string request_str =
   let handle_request_str method_str location_str protocol_str = 
     { default_request with
       rmethod = method_of_string method_str ;
-      location = location_of_string location_str ;
+      location = (* location_of_string *) location_str ;
       rprotocol = protocol_of_string protocol_str }
   in
 

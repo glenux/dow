@@ -51,12 +51,19 @@ let page_from_request request =
     | _ -> page
   in
   match request.HttpTypes.location with
-  | [] -> default_page
-  | pg::_ -> filter_page pg
+  | "/" -> default_page
+  | pg -> 
+      let len = String.length pg
+      in 
+      if len > 1 then 
+        filter_page ( String.sub pg 1 (len -1) )
+      else
+        default_page
 ;;
 
 
 let action_from_request request =
+  (* match the last ~/[a-z]$~ *)
   match request.HttpTypes.location with
   | [] -> default_action
   | _::pg_tail -> 
