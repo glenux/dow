@@ -4,7 +4,7 @@ open HttpTypes;;
 
 let default_answer = {
   status = Client_error Method_not_allowed;
-  aheaders = StringMap.empty ;
+  aheaders = Hashtbl.create 5 ;
   aprotocol = Protocol_1_0 ;
   content = 
     "<html>" ^ 

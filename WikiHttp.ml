@@ -64,6 +64,7 @@ let page_from_request request =
 
 let action_from_request request =
   (* match the last ~/[a-z]$~ *)
+  (*
   match request.HttpTypes.location with
   | [] -> default_action
   | _::pg_tail -> 
@@ -81,6 +82,9 @@ let action_from_request request =
               get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
           | HttpTypes.Delete ->
               get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
+              *)
+  ignore request ;
+  default_action
 ;;
 
 

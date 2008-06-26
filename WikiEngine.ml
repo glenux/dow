@@ -48,7 +48,8 @@ let string_of_request request =
   (request.page)
 ;;
 
-let wiki = ref StringMap.empty
+(* FIXME:  the type of wiki should be generalizable *)
+let wiki : ( (string, string) Hashtbl.t ref ) = ref (Hashtbl.create 5) ;
 ;;
 
 
@@ -80,7 +81,10 @@ let htmlize text =
 
 
 let is_empty page =
-  not ( StringMap.mem page !wiki )
+  (* FIXME: rewrite the following line with a hashtbl
+  not ( StringMap.mem page !wiki ) *)
+  ignore page ;
+  true
 ;;
 
 
@@ -92,10 +96,14 @@ let handle_html page =
    * - htmlized data
    * - edit button
    *)
+  (*
   if ( StringMap.mem page !wiki ) then
     htmlize ( StringMap.find page !wiki )
   else
     raise ( Unknown_page page )
+    *)
+  ignore page;
+  "FIXME: rewrite handle_html with a Hashtbl"
     (* "<h1>Unknown page " ^ page ^ "</h1>" ^
     "<p>Would you like to create it ?</p>" ^
     "<a href=\"/" ^ page ^ "/edit\">Edit</a>" *)
@@ -111,10 +119,14 @@ let handle_raw page =
    * - save button
    * - cancel button
    *)
+  (* FIXME: rewrite StringMap with a Hashtbl
   if ( StringMap.mem page !wiki ) then
     StringMap.find page !wiki 
   else 
     "Write here the content of page " ^ page
+    *)
+  ignore page ;
+  "FIXME: rewrite StringMap with a Hashtbl"
 ;;
 
 let handle_request request = 
