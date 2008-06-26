@@ -5,6 +5,7 @@ dow_OBJS= \
 	  HttpRequest \
 	  HttpAnswer \
 	  Http \
+	  Wiki \
 	  WikiHandler \
 	  WikiHandlerEdit \
 	  WikiHandlerView \

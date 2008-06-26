@@ -1,6 +1,11 @@
 (* vim: set ts=2 sw=2 et : *)
 
-open WikiEngine;;
+(* open WikiEngine;; *)
+
+module WE = WikiEngine;;
+
+let debug = true
+;;
 
 type urlhandler_t =
   | Edit
@@ -15,31 +20,31 @@ let string_from_urlhandler = function
 
 
 let urlhandler_from_action = function
-  | Get_html -> View
-  | Get_text -> Edit
-  | Set_text _ -> Edit
-  | Insert_text (_,_) -> Edit (* FIXME *)
-  | Remove_text (_,_) -> Edit (* FIXME *)
-  | Get_tree -> View (* FIXME *)
+  | WE.Get_html -> View
+  | WE.Get_text -> Edit
+  | WE.Set_text _ -> Edit
+  | WE.Insert_text (_,_) -> Edit (* FIXME *)
+  | WE.Remove_text (_,_) -> Edit (* FIXME *)
+  | WE.Get_tree -> View (* FIXME *)
 ;;
 
 
 let urlhandler_from_string = function
   | "view" -> View
   | "edit" -> Edit
-  | _ -> urlhandler_from_action default_action
+  | _ -> urlhandler_from_action WE.default_action
 ;;
 
 
 
 let get_action_from_urlhandler = function
-  | View -> Get_html
-  | Edit -> Get_text
+  | View -> WE.Get_html
+  | Edit -> WE.Get_text
 ;;
 
 let post_action_from_urlhandler text = function
-  | View -> Get_html
-  | Edit -> Set_text text
+  | View -> WE.Get_html
+  | Edit -> WE.Set_text text
 ;;
 
 
@@ -47,18 +52,18 @@ let post_action_from_urlhandler text = function
 let page_from_request request =
   let filter_page page = 
     match page with
-    | "" -> default_page
+    | "" -> WE.default_page
     | _ -> page
   in
   match request.HttpTypes.location with
-  | "/" -> default_page
+  | "/" -> WE.default_page
   | pg -> 
       let len = String.length pg
       in 
       if len > 1 then 
         filter_page ( String.sub pg 1 (len -1) )
       else
-        default_page
+        WE.default_page
 ;;
 
 
@@ -84,12 +89,12 @@ let action_from_request request =
               get_action_from_urlhandler (urlhandler_from_string uh) (* FIXME *)
               *)
   ignore request ;
-  default_action
+  WE.default_action
 ;;
 
 
 let wikirequest_from_request request = { 
-  link = request ;
+  WE.link = request ;
   page = page_from_request request ;
   action = action_from_request request ;
 }
@@ -99,18 +104,18 @@ let wikirequest_from_request request = {
 let wikicontent_title_from_wikirequest wikirequest =
   let unsupported_action =
     Printf.sprintf "Unsupported action for \"%s\" on page \"%s\"" 
-    ( string_of_action wikirequest.action )
-    wikirequest.page
+    ( WE.string_of_action wikirequest.WE.action )
+    wikirequest.WE.page
   in
-  match wikirequest.action with
-  | Get_html -> 
-      if not ( is_empty wikirequest.page ) then wikirequest.page
-      else "Unknown page " ^ wikirequest.page
-  | Get_text -> Printf.sprintf "%s (editing)" wikirequest.page
-  | Get_tree -> unsupported_action
-  | Set_text _ -> unsupported_action
-  | Insert_text (_, _) -> unsupported_action
-  | Remove_text (_, _) -> unsupported_action
+  match wikirequest.WE.action with
+  | WE.Get_html -> 
+      if not ( WE.is_empty wikirequest.WE.page ) then wikirequest.WE.page
+      else "Unknown page " ^ wikirequest.WE.page
+  | WE.Get_text -> Printf.sprintf "%s (editing)" wikirequest.WE.page
+  | WE.Get_tree -> unsupported_action
+  | WE.Set_text _ -> unsupported_action
+  | WE.Insert_text (_, _) -> unsupported_action
+  | WE.Remove_text (_, _) -> unsupported_action
 ;;
 
 
@@ -133,20 +138,27 @@ let wikicontent_body_from_wikirequest wikirequest =
   in
 
   let wiki_html () = 
-    if not ( is_empty wikirequest.page ) then handle_request wikirequest
-    else Printf.sprintf body_unknown_fmt wikirequest.page
+    if not ( WE.is_empty wikirequest.WE.page ) then 
+      WE.handle_request wikirequest
+    else 
+      Printf.sprintf body_unknown_fmt wikirequest.WE.page
   and wiki_raw () =
-    if not ( is_empty wikirequest.page ) then handle_request wikirequest
-    else "Write here the content of page " ^ wikirequest.page
+    if not ( WE.is_empty wikirequest.WE.page ) then 
+      WE.handle_request wikirequest
+    else 
+      "Write here the content of page " ^ wikirequest.WE.page
   in
 
-  match wikirequest.action with
-  | Get_html -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
-  | Get_text -> Printf.sprintf body_edit_fmt wikirequest.page ( wiki_raw () )
-  | Get_tree -> Printf.sprintf body_edit_fmt wikirequest.page ( wiki_raw () )
-  | Set_text _ -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
-  | Insert_text (_, _) -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
-  | Remove_text (_, _) ->Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.page
+  match wikirequest.WE.action with
+  | WE.Get_html -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.WE.page
+  | WE.Get_text -> Printf.sprintf body_edit_fmt wikirequest.WE.page ( wiki_raw () )
+  | WE.Get_tree -> Printf.sprintf body_edit_fmt wikirequest.WE.page ( wiki_raw () )
+  | WE.Set_text _ -> Printf.sprintf body_view_fmt ( wiki_html () )
+  wikirequest.WE.page
+  | WE.Insert_text (_, _) -> Printf.sprintf body_view_fmt ( wiki_html () )
+  wikirequest.WE.page
+  | WE.Remove_text (_, _) ->Printf.sprintf body_view_fmt ( wiki_html () )
+  wikirequest.WE.page
 ;;
 
 
