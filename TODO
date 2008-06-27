@@ -1,11 +1,12 @@
-* Finish the Wiki basic data accessors (load, store, exists).
+* Finish the Wiki basic data accessors (load, store, exists) for
+  StorageFile and StorageSqlite3
 
 * Once we know where the data is stored, we have to know data format to
-  read/write and get the internal memory structure WikiParser
-  (WikiParserTxt2tag, WikiParselWakka, WikiParserXML, etc.)
+  read/write and get the internal memory structure Parser
+  (ParserTxt2tag, ParselWakka, ParserXML, etc.)
 
 * Clean up accessors as storage_dependant modules (WikiStorageFile,
   WikiStorageSqlite, etc.).
 
-* Create a generic WikiGui (WikiGuiGtk, WikiGuiWeb, etc.)
+* Create a generic Gui (GuiGtk, GuiWeb, etc.)
 
