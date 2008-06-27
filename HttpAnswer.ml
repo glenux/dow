@@ -16,7 +16,7 @@ let default_answer = {
 ;;
 
 (* http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html *)
-let string_of_answer answer =
+let networkdata_of_answer answer =
   let protocol_str = string_of_protocol answer.aprotocol
   and status_code = code_of_status answer.status
   and status_str = string_of_status answer.status
@@ -32,5 +32,12 @@ let string_of_answer answer =
   ( Printf.sprintf "Content-Length: %d\n" content_len ) ^
   ( "\n" ) ^
   ( if answer.send_content then answer.content else "" )
+;;
 
+let string_of_answer answer = 
+  let protocol_str = string_of_protocol answer.aprotocol
+  and status_code = code_of_status answer.status
+  and status_str = string_of_status answer.status
+  in
+  Printf.sprintf "( HTTP/%s %d %s )" protocol_str status_code status_str
 ;;

@@ -1,4 +1,5 @@
 
+(* 
 type url = string
 type text = string
 
@@ -22,4 +23,4 @@ let create () =
 let delete docname = 
         ignore docname ; (* FIXME *)
         ()
-
+*)

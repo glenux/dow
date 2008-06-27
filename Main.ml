@@ -6,8 +6,8 @@ let _ =
   and  http_config = { 
     Http.default_config with 
     Http.port = 9009 ;
-    Http.get_handler = WikiHttp.get_handler ;
-    Http.post_handler = WikiHttp.post_handler ;
+    Http.get_handler = HttpHandler.get_handler ;
+    Http.post_handler = HttpHandler.post_handler ;
     }
 in
 ignore wiki_config ;

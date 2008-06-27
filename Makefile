@@ -1,16 +1,16 @@
 PROGRAMS=dow
 
 dow_OBJS= \
-	  HttpTypes \
-	  HttpRequest \
-	  HttpAnswer \
-	  Http \
 	  Wiki \
 	  WikiHandler \
 	  WikiHandlerEdit \
 	  WikiHandlerView \
 	  WikiEngine \
-	  WikiHttp \
+	  HttpTypes \
+	  HttpRequest \
+	  HttpAnswer \
+	  HttpHandler \
+	  Http \
 	  Document \
 	  Main
 

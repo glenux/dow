@@ -63,7 +63,7 @@ let method_of_string method_str =
 
 
 let string_of_request request =
-  Printf.sprintf "method=[%s] location=[%s] protocol=[%s]" 
+  Printf.sprintf "( method=%s location=%s protocol=%s )" 
   ( string_of_method request.rmethod )
   request.location
   (* string_of_location request.location *)
@@ -71,7 +71,7 @@ let string_of_request request =
 ;;
 
 
-let request_of_string request_str =
+let request_of_networkdata request_str =
   let handle_request_str method_str location_str protocol_str = 
     { default_request with
       rmethod = method_of_string method_str ;
