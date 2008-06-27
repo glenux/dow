@@ -19,11 +19,10 @@ let default_storage = Storage_file
 let default_url = "wiki_data"
 ;;
 
-let default_config = 
-  {
-    storage = default_storage ;
-    url = default_url ;
-  }
+let default_config = {
+  storage = default_storage ;
+  url = default_url ;
+}
 ;;
 
 let create ~config = 
