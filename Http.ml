@@ -79,12 +79,12 @@ let do_accept ~client_sock ~config =
   let answer = answer_of_request ~config ~request 
   in
 
-  let answer_str = (string_of_answer answer)
+  let request_str = (string_of_request request)
+  and answer_str = (string_of_answer answer)
   in
 
   (* send answer back to client *)
-  Printf.printf "<-- HTTP.REQUEST [%s]\n" ( string_of_request request ) ;
-  flush stdout ;
+  Printf.printf "<-- HTTP.REQUEST [%s]\n" request_str ;
   Printf.printf "--> HTTP.RAW [%s]\n" answer_str ; 
   flush stdout ;
   send_string client_sock answer_str ;

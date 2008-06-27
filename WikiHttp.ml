@@ -48,8 +48,9 @@ let post_action_from_urlhandler text = function
 ;;
 
 
-
 let page_from_request request =
+  Printf.printf "page_from_request( %s )\n" 
+    (HttpRequest.string_of_request request );
   let filter_page page = 
     match page with
     | "" -> WE.default_page
@@ -68,6 +69,7 @@ let page_from_request request =
 
 
 let action_from_request request =
+  Printf.printf "action_from_request( ... )\n" ;
   (* match the last ~/[a-z]$~ *)
   (*
   match request.HttpTypes.location with
@@ -93,15 +95,24 @@ let action_from_request request =
 ;;
 
 
-let wikirequest_from_request request = { 
-  WE.link = request ;
-  page = page_from_request request ;
-  action = action_from_request request ;
-}
+let string_of_wikirequest wikirequest =
+  Printf.sprintf "link=[%s] page=[%s] action=..." 
+    wikirequest.WE.link 
+    wikirequest.page
+;;
+
+let wikirequest_from_request request = 
+  Printf.printf "wikirequest_from_request( ... )\n" ;
+  { 
+    WE.link = request ;
+    page = page_from_request request ;
+    action = action_from_request request ;
+  }
 ;;
 
 
 let wikicontent_title_from_wikirequest wikirequest =
+  Printf.printf "wikicontent_title_from_wikirequest( ... )\n" ;
   let unsupported_action =
     Printf.sprintf "Unsupported action for \"%s\" on page \"%s\"" 
     ( WE.string_of_action wikirequest.WE.action )
@@ -120,11 +131,13 @@ let wikicontent_title_from_wikirequest wikirequest =
 
 
 let wikicontent_header_from_wikirequest wikirequest = 
+  Printf.printf "wikicontent_header_from_wikirequest( ... )\n" ;
   "    <title>"^ (wikicontent_title_from_wikirequest wikirequest ) ^ "</title>\n"
 ;;
 
 
 let wikicontent_body_from_wikirequest wikirequest =
+  Printf.printf "wikicontent_body_from_wikirequest( ... )\n" ;
   let body_view_fmt = (
     "%s\n" ^^ "<a href=\"/%s/edit\">Edit</a>\n" )
   and body_edit_fmt = ( 
@@ -163,6 +176,9 @@ let wikicontent_body_from_wikirequest wikirequest =
 
 
 let wikicontent_from_wikirequest wikirequest = 
+  Printf.printf "wikicontent_from_wikirequest( %s )\n" 
+    (string_of_wikirequest wikirequest)
+  ;
   "<html>\n" ^ 
   "  <head>\n" ^
   wikicontent_header_from_wikirequest wikirequest ^
@@ -176,6 +192,7 @@ let wikicontent_from_wikirequest wikirequest =
 
 
 let get_handler request =
+  Printf.printf "get_handler( ... )\n" ;
   let wikirequest = wikirequest_from_request request
   in
   let wikicontent = wikicontent_from_wikirequest wikirequest
@@ -199,6 +216,7 @@ let get_handler request =
 
 
 let head_handler request = 
+  Printf.printf "head_handler( ... )\n" ;
   let get_answer = get_handler request
   in
   { get_answer with
@@ -209,6 +227,7 @@ let head_handler request =
 
 
 let post_handler request =
+  Printf.printf "post_handler( ... )\n" ;
   let post_answer = get_handler request
   in 
   post_answer

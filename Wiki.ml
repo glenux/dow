@@ -51,8 +51,14 @@ let load ~config ~page =
 ;;
 
 let store ~config ~page ~data =
-  ignore config ; 
-  ignore page ;
-  ignore data ;
-  true
+  let filename = (config.url ^ "/" ^ page)
+  and oflags = [Unix.O_CREAT; Unix.O_WRONLY; Unix.O_TRUNC]
+  and datalen = String.length data
+  in
+  let fd = Unix.openfile filename oflags 0644
+  in 
+  ignore ( Unix.write fd data 0 datalen );
+  Unix.close fd ;
+  ()
 ;;
+

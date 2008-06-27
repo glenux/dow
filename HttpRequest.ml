@@ -2,6 +2,9 @@
 
 open HttpTypes;;
 
+let debug = false
+;;
+
 let default_request = {
   rmethod = Get ;
   location = "/" ;
@@ -76,7 +79,7 @@ let request_of_string request_str =
       rprotocol = protocol_of_string protocol_str }
   in
 
-  Printf.printf "<-- HTTP/RAW: [%s]\n" request_str ;
+  if debug then Printf.printf "<-- HTTP/RAW: [%s]\n" request_str ;
   flush stdout ;
   try 
       Scanf.sscanf request_str "%s %s HTTP/%s" handle_request_str
