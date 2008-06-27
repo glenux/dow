@@ -1,6 +1,8 @@
 PROGRAMS=dow
 
 dow_OBJS= \
+	  StorageFile \
+	  StorageSqlite3 \
 	  Wiki \
 	  WikiHandler \
 	  WikiHandlerEdit \
