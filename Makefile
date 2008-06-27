@@ -17,8 +17,10 @@ dow_OBJS= \
 	  Main
 
 OPTS=-w A -warn-error A -g -thread 
-dow_LIBS=unix threads
-#dow_LIBS=graphics unix threads bigarray sdl sdlloader sdlttf
+
+dow_INCS=-I +lablgtk2
+
+dow_LIBS=unix threads lablgtk
 
 include OCaml.mk
 

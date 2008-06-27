@@ -19,7 +19,7 @@ $(1): $$($(1)_OBJS:=.cmx)
 	@echo -n -e "\x1B[31;1m"
 	@echo "[L] $(1)"
 	@echo -n -e "\x1B[0m"
-	$(OCAMLOPT) $($(1)_OPTS) $(OPTS) $(INCS) $(LIBS) $($(1)_LIBS:=.cmxa) $($(1)_OBJS:=.cmx) -o $(1)
+	$(OCAMLOPT) $($(1)_OPTS) $(OPTS) $(INCS) $(LIBS) $($(1)_INCS) $($(1)_LIBS:=.cmxa) $($(1)_OBJS:=.cmx) -o $(1)
 	@echo ""
 endef
 
