@@ -18,7 +18,6 @@ let string_from_urlhandler = function
 
 
 let urlhandler_from_action = function
-  | WikiEngine.Get_html -> View
   | WikiEngine.Get_text -> Edit
   | WikiEngine.Set_text _ -> Edit
   | WikiEngine.Insert_text (_,_) -> Edit (* FIXME *)
@@ -36,12 +35,12 @@ let urlhandler_from_string = function
 
 
 let get_action_from_urlhandler = function
-  | View -> WikiEngine.Get_html
-  | Edit -> WikiEngine.Get_text
+  | View -> (* htmlview_of_text *) WikiEngine.Get_text
+  | Edit -> (* htmledit_of_text *) WikiEngine.Get_text
 ;;
 
 let post_action_from_urlhandler text = function
-  | View -> WikiEngine.Get_html
+  | View -> (* htmlview_of_text *) WikiEngine.Get_text
   | Edit -> WikiEngine.Set_text text
 ;;
 
@@ -113,6 +112,9 @@ let wikirequest_from_request request =
 ;;
 
 
+(* 
+ * is there an action available for this request ?
+ *)
 let wikicontent_title_from_wikirequest wikirequest =
   Printf.printf "wikicontent_title_from_wikirequest( ... )\n" ;
   let unsupported_action =
@@ -121,9 +123,9 @@ let wikicontent_title_from_wikirequest wikirequest =
     wikirequest.WikiEngine.page
   in
   match wikirequest.WikiEngine.action with
-  | WikiEngine.Get_html -> 
+  (* | WikiEngine.Get_html -> 
       if not ( WikiEngine.is_empty wikirequest.WikiEngine.page ) then wikirequest.WikiEngine.page
-      else "Unknown page " ^ wikirequest.WikiEngine.page
+      else "Unknown page " ^ wikirequest.WikiEngine.page *)
   | WikiEngine.Get_text -> Printf.sprintf "%s (editing)" wikirequest.WikiEngine.page
   | WikiEngine.Get_tree -> unsupported_action
   | WikiEngine.Set_text _ -> unsupported_action
@@ -165,7 +167,8 @@ let wikicontent_body_from_wikirequest wikirequest =
   in
 
   match wikirequest.WikiEngine.action with
-  | WikiEngine.Get_html -> Printf.sprintf body_view_fmt ( wiki_html () ) wikirequest.WikiEngine.page
+  (* | WikiEngine.Get_html -> Printf.sprintf body_view_fmt ( wiki_html () )
+   * wikirequest.WikiEngine.page *)
   | WikiEngine.Get_text -> Printf.sprintf body_edit_fmt wikirequest.WikiEngine.page ( wiki_raw () )
   | WikiEngine.Get_tree -> Printf.sprintf body_edit_fmt wikirequest.WikiEngine.page ( wiki_raw () )
   | WikiEngine.Set_text _ -> Printf.sprintf body_view_fmt ( wiki_html () )

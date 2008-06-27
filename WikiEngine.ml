@@ -3,7 +3,7 @@
 
 
 type action_t = 
-  | Get_html
+(*  | Get_html *)
   | Get_text
   | Get_tree
   (* text actions *)
@@ -14,9 +14,12 @@ type action_t =
 ;;
 
 type 'a request_t = {
-  link : 'a ;
-  page : string ;
-  action : action_t ;
+  (* user interface request link *)
+  link : 'a ; 
+  (* requested Page *)
+  page : string ; 
+  (* requested action on page *)
+  action : action_t ; 
 }
 ;;
 
@@ -29,12 +32,11 @@ type answer_t = {
 let default_page = "HomePage"
 ;;
 
-let default_action = Get_html
+let default_action = Get_text
 ;;
 
 let string_of_action action = 
   match action with
-  | Get_html -> "Get Html"
   | Get_text -> "Get Text"
   | Get_tree -> "Get Tree (?)"
   | Set_text text -> Printf.sprintf "Set Text [%s]" text
