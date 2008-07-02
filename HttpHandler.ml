@@ -45,6 +45,37 @@ let post_action_from_urlhandler text = function
 ;;
 
 
+let url_clean location = 
+  (* FIXME: fill the url_clean function *)
+  (* x//y => /y *)
+  (* .. => not allowed (we are not in a classical webserver *)
+  (* allowed URL patterns : 
+    
+    URL := 
+      DIRECTORY SLASH METHOD
+
+    DIRECTORY := 
+      | SLASH
+      | SLASH WIKINAME
+      | DIRECTORY SLASH WIKINAME 
+
+    WIKINAME :=
+      /[A-Z][a-z0-9]x([A-Z][a-z0-9]x)x/ where x is *
+
+    METHOD :=
+      | "view"
+      | "post"
+      | "edit"
+
+    SLASH :=
+      "/"
+
+    *)
+  location
+  ;;
+
+
+
 let page_from_request request =
   Printf.printf "page_from_request( %s )\n" 
     (HttpRequest.string_of_request request );
