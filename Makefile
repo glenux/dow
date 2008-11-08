@@ -1,6 +1,7 @@
 PROGRAMS=dow
 
 dow_OBJS= \
+	  GuiHttp \
 	  Storage \
 	  StorageFile \
 	  StorageSqlite3 \
