@@ -43,3 +43,6 @@ let create config = {
     Storage.exists = exists config ;
 }
 ;;
+
+Storage.register config_default.Storage.name create;;
+

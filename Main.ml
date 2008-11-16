@@ -3,7 +3,7 @@
 (* Listen on port *)
 let _ =
   let storage_config = {
-    Storage.name = "text" ;
+    Storage.name = "file" ;
     Storage.url = "wiki_data" ;
   }
   and  http_config = { 
@@ -12,11 +12,24 @@ let _ =
     Http.get_handler = HttpHandler.get_handler ;
     Http.post_handler = HttpHandler.post_handler ;
     }
-in
-(* Storage.create "file" *)
-ignore storage_config ;
-Printf.printf "Desktop-based Ocaml Wiki\n" ; flush stdout ;
-Http.server_run http_config
-;;
+  in
+  (* load configuration file *)
+  (*
 
+  storage.url = file://
+  gui.gtk.enable = true
+
+  gui.http.enable = true
+  gui.http.port = 9009
+
+  storage.
+  # 
+  *)
+  (* Storage.create "file" *)
+  let storage = Storage.create storage_config
+  in
+  ignore storage ; 
+  Printf.printf "*** Dow : Desktop-based Ocaml Wiki ***\n" ; flush stdout ;
+  GuiHttp.run http_config
+;;
 

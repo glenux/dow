@@ -94,3 +94,7 @@ let request_of_networkdata request_str =
     | End_of_file -> raise (Invalid_request request_str)
 ;;
 
+let run wiki_conf =
+  (* prepare http configuration from wiki config *)
+  ignore wiki_conf
+;;
