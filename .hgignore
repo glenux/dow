@@ -1,0 +1,7 @@
+.*\.o$
+.*\.cmi$
+.*\.cmx$
+\.depend$
+^dow$
+doc/.*\.html$
+doc/.*\.css$
